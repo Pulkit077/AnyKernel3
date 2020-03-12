@@ -267,7 +267,7 @@ abort() {
 do_devicecheck() {
   [ "$(file_getprop anykernel.sh do.devicecheck)" == 1 ] || return 1;
   local device devicename match product testname vendordevice vendorproduct;
-  ui_print "Checking device...";
+  ui_print " " "Checking device...";
   device=$(getprop ro.product.device 2>/dev/null);
   product=$(getprop ro.build.product 2>/dev/null);
   vendordevice=$(getprop ro.product.vendor.device 2>/dev/null);
@@ -275,14 +275,14 @@ do_devicecheck() {
   for testname in $(file_getprop anykernel.sh 'device.name.*'); do
     for devicename in $device $product $vendordevice $vendorproduct; do
       if [ "$devicename" == "$testname" ]; then
-        ui_print "$testname" " ";
+        ui_print "- $testname" " ";
         match=1;
         break 2;
       fi;
     done;
   done;
   if [ ! "$match" ]; then
-    abort " " "Unsupported device. Aborting...";
+    abort "Unsupported device. Aborting...";
   fi;
 }
 int2ver() {
@@ -316,7 +316,7 @@ do_versioncheck() {
     done;
   fi;
   if [ "$supported" ]; then
-    ui_print "$android_ver" " ";
+    ui_print "- $android_ver" " ";
   else
     abort " " "Unsupported Android version. Aborting...";
   fi;
@@ -339,7 +339,7 @@ do_levelcheck() {
     hi_lvl=9999-99;
   fi;
   if echo -e "$hi_lvl\n$lo_lvl\n$parsed_lvl" | $BB sort -g | $BB grep -n "$parsed_lvl" | $BB grep -q '^2:'; then
-    ui_print "$android_lvl" " ";
+    ui_print "- $android_lvl" " ";
   else
     abort " " "Unsupported Android security patch level. Aborting...";
   fi;
@@ -459,21 +459,17 @@ if [ $? != 0 -o -z "$(ls bin)" ]; then
   abort "Busybox setup failed. Aborting...";
 fi;
 
-if [ -f banner ]; then
-  ui_printfile banner;
-  ui_print " " " ";
-fi;
-
-KERNEL_STRING="$(file_getprop anykernel.sh kernel.string)";
-ui_print "$KERNEL_STRING";
-if [ -f version ]; then
-  ui_print " ";
-  ui_printfile version;
-  ui_print " ";
-fi;
-ui_print " " "AnyKernel3 by osm0sis @ xda-developers" " ";
-$BB grep -oE 'AK_BASE.*' META-INF/com/google/android/updater-script >&2;
-ui_print " ";
+ui_print "=======================================";
+ui_print "        _  __             _";
+ui_print "       | |/ /_____      _| |";
+ui_print "       | ' // _ \ \ /\ / / |";
+ui_print "       | . \  __/\ V  V /| |___";
+ui_print "       |_|\_\___| \_/\_/ |_____|";
+ui_print "=======================================";
+ui_print "          -by @Pulkit077";
+ui_print "                                       ";
+ui_print "AnyKernel3 by osm0sis @ xda-developers ";
+ui_print "                                       ";
 
 setup_env;
 
@@ -481,7 +477,7 @@ do_devicecheck;
 do_versioncheck;
 do_levelcheck;
 
-ui_print "Installing...";
+ui_print "- Installing...";
 CORE=$($BB grep -oE 'ak.*core.sh' anykernel.sh);
 [ -f tools/$CORE ] || $BB ln -s $AKHOME/tools/ak*-core.sh $AKHOME/tools/$CORE;
 PATH="$AKHOME/bin:$PATH" home=$AKHOME $BB ash anykernel.sh $2;
@@ -498,4 +494,5 @@ if [ "$(file_getprop anykernel.sh do.cleanup)" == 1 ]; then
   cleanup;
 fi;
 
-ui_print " " " " "Done!";
+ui_print " " "Done!";
+ui_print "-----" " ";
